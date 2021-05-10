@@ -1,0 +1,37 @@
+from selenium import webdriver
+import time
+
+options = webdriver.ChromeOptions()
+
+options.add_argument('--ignore-certificate-errors-spki-list')
+options.add_argument('--ignore-ssl-errors')
+driver= webdriver.Chrome( r'C:\Program Files (x86)\chromedriver.exe' ==options)
+# getting the url of  website which is going to be crawl
+
+driver.get('https://www.amazon.in/')
+
+
+
+search = driver.find_element_by_xpath('//*[@id="twotabsearchtextbox"]').send_keys("iphone 12 pro max")
+search_box= driver.find_element_by_xpath('//*[@id="nav-search-submit-button"]').click()
+brand= driver.find_element_by_xpath('//*[@id="p_89/Apple"]/span/a/span').click()
+for i in range(2):
+    products=driver.find_elements_by_xpath('//span[@class="a-size-base-plus a-color-base a-text-normal"]')
+    prices=driver.find_elements_by_xpath('//span[@class="a-price-whole"]')
+    next_page=driver.find_element_by_xpath('//*[@id="search"]/div[1]/div/div[1]/div/span[3]/div[2]/div[26]/span/div/div/ul/li[5]/a').click()
+
+    num_page_items=len(products)
+    with open ('container.txt','w') as f:
+        myphones=[]
+        myprices=[]
+        for mobile in products:
+            myphones.append(mobile)
+        for money in prices:
+            myprices.append(money)
+        final= zip(myphones,myprices)
+        for j in list(final):
+            f.write(j.text)
+
+
+time.sleep(10)
+driver.quit()
