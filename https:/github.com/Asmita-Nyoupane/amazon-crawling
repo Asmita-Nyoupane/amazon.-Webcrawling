@@ -1,37 +1,33 @@
 from selenium import webdriver
 import time
+import csv
 
-options = webdriver.ChromeOptions()
-
-options.add_argument('--ignore-certificate-errors-spki-list')
-options.add_argument('--ignore-ssl-errors')
-driver= webdriver.Chrome( r'C:\Program Files (x86)\chromedriver.exe' ==options)
-# getting the url of  website which is going to be crawl
-
-driver.get('https://www.amazon.in/')
-
+MAX_NUM_PAGE = 10
+driver = webdriver.Chrome(r'C:\Program Files (x86)\chromedriver.exe')
+driver.maximize_window()
+with open('result1.csv', 'w') as f:
+    f.write("Names of Phones ; Prices\n")
+driver.get("https://www.amazon.in/")
 
 
-search = driver.find_element_by_xpath('//*[@id="twotabsearchtextbox"]').send_keys("iphone 12 pro max")
-search_box= driver.find_element_by_xpath('//*[@id="nav-search-submit-button"]').click()
-brand= driver.find_element_by_xpath('//*[@id="p_89/Apple"]/span/a/span').click()
-for i in range(2):
-    products=driver.find_elements_by_xpath('//span[@class="a-size-base-plus a-color-base a-text-normal"]')
-    prices=driver.find_elements_by_xpath('//span[@class="a-price-whole"]')
-    next_page=driver.find_element_by_xpath('//*[@id="search"]/div[1]/div/div[1]/div/span[3]/div[2]/div[26]/span/div/div/ul/li[5]/a').click()
+search = driver.find_element_by_xpath(
+    '//*[@id="twotabsearchtextbox"]').send_keys("Samsung")
+botton = driver.find_element_by_xpath(
+    '//*[@id="nav-search-submit-button"]').click()
+brand = driver.find_element_by_xpath(
+    '//*[@id="p_89/Samsung"]/span/a/div/label/i').click()
+    
+for i in range( 1, MAX_NUM_PAGE + 1):
+    phones = driver.find_elements_by_xpath('//*[@class="a-size-mini a-spacing-none a-color-base s-line-clamp-2"]')
+    prices = driver.find_elements_by_xpath('//* [@class="a-price-whole"]')
+    with open('result1.csv', 'a') as f:
+        for i in range(len(phones)):
 
-    num_page_items=len(products)
-    with open ('container.txt','w') as f:
-        myphones=[]
-        myprices=[]
-        for mobile in products:
-            myphones.append(mobile)
-        for money in prices:
-            myprices.append(money)
-        final= zip(myphones,myprices)
-        for j in list(final):
-            f.write(j.text)
-
+            f.write(phones[i].text + ";" + prices[i].text + "\n")
+    try:
+        next = driver.find_element_by_xpath('//*[@id="search"]/div[1]/div/div[1]/div/span[3]/div[2]/div[26]/span/div/div/ul/li[7]/a').click()
+    except:
+        False
 
 time.sleep(10)
-driver.quit()
+driver.close()
